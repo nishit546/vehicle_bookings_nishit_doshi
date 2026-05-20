@@ -95,6 +95,28 @@ const seedDB = async () => {
     const result = await Booking.insertMany(cleanedBookings, { ordered: false });
     console.log(`Successfully seeded ${result.length} bookings into MongoDB.`);
 
+    // Seed default users for testing
+    console.log('Seeding default testing users...');
+    const User = require('../models/User');
+    await User.deleteMany({});
+    await User.create([
+      {
+        name: 'Default Admin',
+        email: 'admin@booking.com',
+        password: 'admin123',
+        role: 'admin',
+        customerId: 'CID_ADMIN',
+      },
+      {
+        name: 'Default User',
+        email: 'user@booking.com',
+        password: 'user123',
+        role: 'user',
+        customerId: 'CID_USER',
+      },
+    ]);
+    console.log('Seeded admin (admin@booking.com / admin123) and user (user@booking.com / user123) successfully.');
+
     await mongoose.connection.close();
     console.log('Database connection closed.');
     process.exit(0);

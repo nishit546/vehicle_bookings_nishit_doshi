@@ -1,0 +1,469 @@
+{
+  "info": {
+    "_postman_id": "8c45f4df-231a-4de1-8be9-e0d8f07b1d9c",
+    "name": "Vehicle Bookings API",
+    "description": "Postman collection for testing the Vehicle Bookings Backend API endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Check Server Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/health",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Admin\",\n  \"email\": \"testadmin@booking.com\",\n  \"password\": \"admin123\",\n  \"role\": \"admin\",\n  \"customerId\": \"CID_TEST_ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/register",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson.success && responseJson.data && responseJson.data.token) {",
+                  "    pm.environment.set(\"TOKEN\", responseJson.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@booking.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/login",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/auth/profile",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"CNR_NEW_TEST_9999\",\n  \"date\": \"2026-05-20T18:00:00.000Z\",\n  \"time\": \"18:00:00\",\n  \"bookingStatus\": \"Success\",\n  \"customerId\": \"CID802429\",\n  \"vehicleType\": \"Mini\",\n  \"pickupLocation\": \"Indiranagar\",\n  \"dropLocation\": \"Whitefield\",\n  \"vTat\": 120,\n  \"cTat\": 45,\n  \"bookingValue\": 450,\n  \"paymentMethod\": \"UPI\",\n  \"rideDistance\": 15,\n  \"driverRating\": 4.5,\n  \"customerRating\": 4.8\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/bookings",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Bookings (Paginated, Sorted, Filtered)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/bookings?page=1&limit=10&sortBy=date:desc&status=Success&vehicleType=Mini&search=Indiranagar",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "date:desc"
+                },
+                {
+                  "key": "status",
+                  "value": "Success"
+                },
+                {
+                  "key": "vehicleType",
+                  "value": "Mini"
+                },
+                {
+                  "key": "search",
+                  "value": "Indiranagar"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Booking by BookingId",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/bookings/CNR2940424040",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings",
+                "CNR2940424040"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Booking",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingStatus\": \"Success\",\n  \"bookingValue\": 500,\n  \"paymentMethod\": \"Credit Card\",\n  \"customerRating\": 5.0\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/bookings/CNR_NEW_TEST_9999",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings",
+                "CNR_NEW_TEST_9999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Booking",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/bookings/CNR_NEW_TEST_9999",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings",
+                "CNR_NEW_TEST_9999"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics (Admin)",
+      "item": [
+        {
+          "name": "Get Revenue Stats",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/analytics/revenue",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "analytics",
+                "revenue"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Status Distribution",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/analytics/status-distribution",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "analytics",
+                "status-distribution"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Location Demand",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/analytics/location-demand",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "analytics",
+                "location-demand"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Ratings Summary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/analytics/ratings-summary",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "analytics",
+                "ratings-summary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "TOKEN",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
