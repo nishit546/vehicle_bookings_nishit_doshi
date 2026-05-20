@@ -39,37 +39,39 @@ A clean, production-ready, MVC-structured Express & MongoDB backend built for ma
 
 ```
 vehicle_bookings_nishit_doshi/
-├── config/              # Database connection and environment config
-│   └── db.js
-├── controllers/         # MVC Controllers handling request-response logic
-│   ├── analyticsController.js
-│   ├── authController.js
-│   └── bookingController.js
-├── middlewares/         # Middlewares (Auth, Logger, Error Handler)
-│   ├── auth.js
-│   ├── errorHandler.js
-│   └── logger.js
-├── models/              # Mongoose schemas/models
-│   ├── Booking.js
-│   └── User.js
-├── routes/              # Express API Routes
-│   ├── analyticsRoutes.js
-│   ├── authRoutes.js
-│   ├── bookingRoutes.js
-│   └── healthRoutes.js
-├── seeders/             # Database seeding scripts
-│   └── seed.js
-├── utils/               # DRY Helpers (ApiResponse, AsyncHandler, Paginate, Auth)
-│   ├── apiResponse.js
-│   ├── asyncHandler.js
-│   ├── auth.js
-│   └── paginate.js
-├── .env                 # Local environment configuration file (ignored in Git)
-├── .env.example         # Environment template file
-├── .gitignore           # File/folder patterns to exclude from Git
-├── package.json         # Node.js project manifest
-├── server.js            # Entry point for bootstrapping the application
-└── Vehicle_Bookings.json # Raw JSON dataset
+├── backend/              # Parent folder containing all backend source code & assets
+│   ├── config/           # Database connection and environment config
+│   │   └── db.js
+│   ├── controllers/      # MVC Controllers handling request-response logic
+│   │   ├── analyticsController.js
+│   │   ├── authController.js
+│   │   └── bookingController.js
+│   ├── middlewares/      # Middlewares (Auth, Logger, Error Handler)
+│   │   ├── auth.js
+│   │   ├── errorHandler.js
+│   │   └── logger.js
+│   ├── models/           # Mongoose schemas/models
+│   │   ├── Booking.js
+│   │   └── User.js
+│   ├── routes/           # Express API Routes
+│   │   ├── analyticsRoutes.js
+│   │   ├── authRoutes.js
+│   │   ├── bookingRoutes.js
+│   │   └── healthRoutes.js
+│   ├── seeders/          # Database seeding scripts
+│   │   └── seed.js
+│   ├── utils/            # DRY Helpers (ApiResponse, AsyncHandler, Paginate, Auth)
+│   │   ├── apiResponse.js
+│   │   ├── asyncHandler.js
+│   │   ├── auth.js
+│   │   └── paginate.js
+│   ├── .env              # Local environment configuration file (ignored in Git)
+│   ├── .env.example      # Environment template file
+│   ├── package.json      # Node.js project manifest
+│   ├── server.js         # Entry point for bootstrapping the application
+│   ├── Vehicle_Bookings.json # Raw JSON dataset
+│   └── vehicle_bookings_postman_collection.json # Exported Postman collection
+└── .gitignore            # Root-level Git ignore configuration
 ```
 
 ---
