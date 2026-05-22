@@ -190,16 +190,25 @@ const getBookings = asyncHandler(async (req, res) => {
     ];
   }
 
-  // ── Sort param: ?sort=Booking_Value or ?sort=-Booking_Value ──────────────
-  // Maps to sortBy format expected by paginate utility: "field:asc" / "field:desc"
+  // ── Sort param: ?sort=Field or ?sort=-Field ──────────────────────────────
+  // Prefix dash (-) means descending. Maps human-readable keys to Mongoose field names.
+  // Part 1 — Booking_Value, Ride_Distance, Driver_Ratings, Customer_Rating, Date
+  const sortFieldMap = {
+    'Booking_Value':   'bookingValue',   // ?sort=Booking_Value
+    'Ride_Distance':   'rideDistance',   // ?sort=Ride_Distance
+    'Driver_Ratings':  'driverRating',   // ?sort=Driver_Ratings
+    'Customer_Rating': 'customerRating', // ?sort=Customer_Rating
+    'Date':            'date',           // ?sort=Date
+  };
+
   let resolvedSortBy = sortBy;
   if (sort) {
-    if (sort.startsWith('-')) {
-      resolvedSortBy = `${sort.slice(1).replace('Booking_Value', 'bookingValue')}:desc`;
-    } else {
-      resolvedSortBy = `${sort.replace('Booking_Value', 'bookingValue')}:asc`;
-    }
+    const isDesc  = sort.startsWith('-');
+    const key     = isDesc ? sort.slice(1) : sort;
+    const field   = sortFieldMap[key] || key;
+    resolvedSortBy = `${field}:${isDesc ? 'desc' : 'asc'}`;
   }
+
 
   const data = await paginate(Booking, query, { page, limit, sortBy: resolvedSortBy });
   return ApiResponse.success(res, 'Bookings fetched successfully.', data, 200);
