@@ -4,60 +4,204 @@ const asyncHandler = require('../utils/asyncHandler');
 const paginate = require('../utils/paginate');
 
 /**
- * @desc    Fetch all bookings (with filtering, search, sorting, pagination)
+ * @desc    Fetch all bookings with full query-param filtering, sorting, pagination
  * @route   GET /api/v1/bookings
  * @access  Private
+ *
+ * Supported Query Params:
+ * ── Part 1 (Queries 1–8) ─────────────────────────────────────────────────────
+ *   ?status=Success            Filter by booking status (case-insensitive)
+ *   ?vehicle=Bike              Filter by vehicle type  (alias: vehicleType)
+ *   ?payment=UPI               Filter by payment method (alias: paymentMethod)
+ *   ?pickup=Indiranagar        Filter by pickup location
+ *   ?drop=Jayanagar            Filter by drop location
+ *   ?date=2024-07-26           Filter by exact date (YYYY-MM-DD)
+ *   ?time=14:00                Filter by time prefix (HH:MM)
+ *   ?driverRating=4            Filter by exact driver rating
+ * ── Part 2 (Queries 9–16) ────────────────────────────────────────────────────
+ *   ?customerRating=5          Filter by exact customer rating
+ *   ?minFare=200               Bookings with fare >= minFare
+ *   ?maxFare=1000              Bookings with fare <= maxFare
+ *   ?minDistance=10            Bookings with distance >= minDistance
+ *   ?maxDistance=40            Bookings with distance <= maxDistance
+ *   ?customer=CID123456        Filter by customer ID (alias: customerId)
+ *   ?incomplete=Yes            Filter by incompleteRides field
+ *   ?cancelledByDriver=true    Fetch driver-cancelled rides
+ * ── Part 3 (Queries 17–23) ───────────────────────────────────────────────────
+ *   ?cancelledByCustomer=true  Fetch customer-cancelled rides
+ *   ?sort=Booking_Value        Sort by booking value ascending
+ *   ?sort=-Booking_Value       Sort by booking value descending
+ *   ?minRating=4&maxRating=5   Filter by driver rating range
+ *   ?distanceAbove=20          Bookings with distance > 20 (long rides)
+ *   ?distanceBelow=10          Bookings with distance < 10 (short rides)
+ * ── Part 4 (Queries 24–30) ───────────────────────────────────────────────────
+ *   ?month=07                  Filter by month number (1–12)
+ *   ?year=2024                 Filter by year
+ *   ?hour=18                   Filter by hour of day (0–23) from time field
  */
 const getBookings = asyncHandler(async (req, res) => {
   const {
-    page,
-    limit,
-    sortBy,
-    status,
-    vehicleType,
-    customerId,
-    paymentMethod,
-    search,
-    minDistance,
-    maxDistance,
-    minVal,
-    maxVal,
+    page, limit, sortBy,
+    // Legacy / original params
+    vehicleType, customerId, paymentMethod,
+    search, minVal, maxVal,
+    // Part 1 — Queries 1–8
+    status, vehicle, payment, pickup, drop,
+    date, time, driverRating, customer,
+    // Part 2 — Queries 9–16
+    customerRating, minFare, maxFare,
+    minDistance, maxDistance,
+    incomplete, cancelledByDriver,
+    // Part 3 — Queries 17–23
+    cancelledByCustomer, sort,
+    minRating, maxRating,
+    distanceAbove, distanceBelow,
+    // Part 4 — Queries 24–30
+    month, year, hour,
   } = req.query;
 
-  // Base query: only fetch non-deleted bookings
+  // Base query
   const query = { isDeleted: false };
+  const exprConditions = []; // for $expr / date extraction conditions
 
-  // 1. Direct Field Filtering
-  if (status) query.bookingStatus = status;
-  if (vehicleType) query.vehicleType = vehicleType;
-  if (customerId) query.customerId = customerId;
-  if (paymentMethod) query.paymentMethod = paymentMethod;
+  // ── Part 1: Basic Field Filters ───────────────────────────────────────────
 
-  // 2. Range Filtering — Ride Distance
+  // ?status= — supports multi-word statuses (e.g. "Driver Not Found")
+  if (status) query.bookingStatus = { $regex: status, $options: 'i' };
+
+  // ?vehicle= or ?vehicleType=
+  if (vehicle) query.vehicleType = { $regex: vehicle, $options: 'i' };
+  else if (vehicleType) query.vehicleType = { $regex: vehicleType, $options: 'i' };
+
+  // ?payment= or ?paymentMethod=
+  if (payment) query.paymentMethod = { $regex: payment, $options: 'i' };
+  else if (paymentMethod) query.paymentMethod = { $regex: paymentMethod, $options: 'i' };
+
+  // ?pickup= — pickup location (case-insensitive)
+  if (pickup) query.pickupLocation = { $regex: pickup, $options: 'i' };
+
+  // ?drop= — drop location (case-insensitive)
+  if (drop) query.dropLocation = { $regex: drop, $options: 'i' };
+
+  // ?date=YYYY-MM-DD — match full calendar day
+  if (date) {
+    const start = new Date(date);
+    const end = new Date(date);
+    end.setDate(end.getDate() + 1);
+    if (!isNaN(start)) query.date = { $gte: start, $lt: end };
+  }
+
+  // ?time=HH:MM — prefix match on stored time string
+  if (time) query.time = { $regex: `^${time}`, $options: 'i' };
+
+  // ?driverRating=4 — exact driver rating
+  if (driverRating !== undefined) query.driverRating = parseFloat(driverRating);
+
+  // ── Part 2: Rating, Fare, Distance, Boolean Filters ───────────────────────
+
+  // ?customer= or ?customerId=
+  if (customer) query.customerId = customer;
+  else if (customerId) query.customerId = customerId;
+
+  // ?customerRating=5
+  if (customerRating !== undefined) query.customerRating = parseFloat(customerRating);
+
+  // ?minFare= / ?maxFare= (alias for minVal/maxVal)
+  const fareMin = minFare || minVal;
+  const fareMax = maxFare || maxVal;
+  if (fareMin || fareMax) {
+    query.bookingValue = {};
+    if (fareMin) query.bookingValue.$gte = Number(fareMin);
+    if (fareMax) query.bookingValue.$lte = Number(fareMax);
+  }
+
+  // ?minDistance= / ?maxDistance=
   if (minDistance || maxDistance) {
-    query.rideDistance = {};
+    query.rideDistance = query.rideDistance || {};
     if (minDistance) query.rideDistance.$gte = Number(minDistance);
     if (maxDistance) query.rideDistance.$lte = Number(maxDistance);
   }
 
-  // 3. Range Filtering — Booking Value
-  if (minVal || maxVal) {
-    query.bookingValue = {};
-    if (minVal) query.bookingValue.$gte = Number(minVal);
-    if (maxVal) query.bookingValue.$lte = Number(maxVal);
+  // ?incomplete=Yes — filter by incompleteRides field value
+  if (incomplete) query.incompleteRides = { $regex: incomplete, $options: 'i' };
+
+  // ?cancelledByDriver=true — fetch rides where driver cancelled
+  if (cancelledByDriver === 'true') {
+    query.canceledRidesByDriver = { $exists: true, $ne: null };
   }
 
-  // 4. Case-Insensitive Regex Search on Locations / bookingId
+  // ── Part 3: Cancellation, Sort, Rating Range, Distance Range ─────────────
+
+  // ?cancelledByCustomer=true
+  if (cancelledByCustomer === 'true') {
+    query.canceledRidesByCustomer = { $exists: true, $ne: null };
+  }
+
+  // ?minRating= / ?maxRating= — driver rating range
+  if (minRating || maxRating) {
+    query.driverRating = query.driverRating || {};
+    if (minRating) query.driverRating.$gte = parseFloat(minRating);
+    if (maxRating) query.driverRating.$lte = parseFloat(maxRating);
+  }
+
+  // ?distanceAbove=20 (long rides — exclusive lower bound)
+  if (distanceAbove) {
+    query.rideDistance = query.rideDistance || {};
+    query.rideDistance.$gt = Number(distanceAbove);
+  }
+
+  // ?distanceBelow=10 (short rides — exclusive upper bound)
+  if (distanceBelow) {
+    query.rideDistance = query.rideDistance || {};
+    query.rideDistance.$lt = Number(distanceBelow);
+  }
+
+  // ── Part 4: Date Component Filters ───────────────────────────────────────
+
+  // ?month=07 — filter by month number (1–12)
+  if (month) {
+    exprConditions.push({ $eq: [{ $month: '$date' }, parseInt(month, 10)] });
+  }
+
+  // ?year=2024 — filter by calendar year
+  if (year) {
+    exprConditions.push({ $eq: [{ $year: '$date' }, parseInt(year, 10)] });
+  }
+
+  // ?hour=18 — filter by hour prefix in time string (e.g. "18:00:00")
+  if (hour !== undefined) {
+    const paddedHour = String(parseInt(hour, 10)).padStart(2, '0');
+    query.time = { $regex: `^${paddedHour}:`, $options: 'i' };
+  }
+
+  // Merge $expr conditions if any date extraction filters are present
+  if (exprConditions.length > 0) {
+    query.$expr = exprConditions.length === 1
+      ? exprConditions[0]
+      : { $and: exprConditions };
+  }
+
+  // ── Existing: Text Search ─────────────────────────────────────────────────
   if (search) {
     query.$or = [
       { pickupLocation: { $regex: search, $options: 'i' } },
-      { dropLocation: { $regex: search, $options: 'i' } },
-      { bookingId: { $regex: search, $options: 'i' } },
+      { dropLocation:   { $regex: search, $options: 'i' } },
+      { bookingId:      { $regex: search, $options: 'i' } },
     ];
   }
 
-  const data = await paginate(Booking, query, { page, limit, sortBy });
+  // ── Sort param: ?sort=Booking_Value or ?sort=-Booking_Value ──────────────
+  // Maps to sortBy format expected by paginate utility: "field:asc" / "field:desc"
+  let resolvedSortBy = sortBy;
+  if (sort) {
+    if (sort.startsWith('-')) {
+      resolvedSortBy = `${sort.slice(1).replace('Booking_Value', 'bookingValue')}:desc`;
+    } else {
+      resolvedSortBy = `${sort.replace('Booking_Value', 'bookingValue')}:asc`;
+    }
+  }
 
+  const data = await paginate(Booking, query, { page, limit, sortBy: resolvedSortBy });
   return ApiResponse.success(res, 'Bookings fetched successfully.', data, 200);
 });
 
@@ -69,9 +213,7 @@ const getBookings = asyncHandler(async (req, res) => {
 const getBookingById = asyncHandler(async (req, res) => {
   const { bookingId } = req.params;
 
-  // Try matching by custom bookingId field first, then fall back to Mongo _id
   let booking = await Booking.findOne({ bookingId, isDeleted: false });
-
   if (!booking && bookingId.match(/^[0-9a-fA-F]{24}$/)) {
     booking = await Booking.findOne({ _id: bookingId, isDeleted: false });
   }
@@ -90,29 +232,13 @@ const getBookingById = asyncHandler(async (req, res) => {
  */
 const createBooking = asyncHandler(async (req, res) => {
   const {
-    bookingId,
-    date,
-    time,
-    bookingStatus,
-    customerId,
-    vehicleType,
-    pickupLocation,
-    dropLocation,
-    vTat,
-    cTat,
-    canceledRidesByCustomer,
-    canceledRidesByDriver,
-    incompleteRides,
-    incompleteRidesReason,
-    bookingValue,
-    paymentMethod,
-    rideDistance,
-    driverRating,
-    customerRating,
-    vehicleImage,
+    bookingId, date, time, bookingStatus, customerId, vehicleType,
+    pickupLocation, dropLocation, vTat, cTat, canceledRidesByCustomer,
+    canceledRidesByDriver, incompleteRides, incompleteRidesReason,
+    bookingValue, paymentMethod, rideDistance, driverRating,
+    customerRating, vehicleImage,
   } = req.body;
 
-  // Check for duplicate bookingId
   const bookingExists = await Booking.findOne({ bookingId });
   if (bookingExists) {
     return ApiResponse.error(res, `Booking with ID ${bookingId} already exists.`, null, 400);
@@ -173,7 +299,6 @@ const updateBooking = asyncHandler(async (req, res) => {
   });
 
   const updatedBooking = await booking.save();
-
   return ApiResponse.success(res, 'Booking updated successfully.', updatedBooking, 200);
 });
 
@@ -201,7 +326,6 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
 
   booking.bookingStatus = bookingStatus;
   const updatedBooking = await booking.save();
-
   return ApiResponse.success(res, 'Booking status updated successfully.', updatedBooking, 200);
 });
 
@@ -224,7 +348,6 @@ const deleteBooking = asyncHandler(async (req, res) => {
 
   booking.isDeleted = true;
   await booking.save();
-
   return ApiResponse.success(res, `Booking ${bookingId} deleted successfully.`, null, 200);
 });
 
