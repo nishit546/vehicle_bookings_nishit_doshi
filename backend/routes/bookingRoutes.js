@@ -31,6 +31,17 @@ const {
   getByVtat,
   getByCtat,
   getByDay,
+  // Part 3 — Routes 21 to 30
+  getByMonth,
+  getByYear,
+  getByHour,
+  getByMinute,
+  getBySource,
+  getByDestination,
+  getByVehicleImage,
+  getByFare,
+  getCustomerHistory,
+  getCustomerLatest,
 } = require('../controllers/filterController');
 
 const { protect } = require('../middlewares/auth');
@@ -68,5 +79,17 @@ router.get('/cancel/driver/:reason',      getByCancelDriver);      // 17
 router.get('/vtat/:minutes',              getByVtat);              // 18
 router.get('/ctat/:minutes',              getByCtat);              // 19
 router.get('/day/:day',                   getByDay);               // 20
+
+// ── Part 3: Filter Routes (21–30) ─────────────────────────────────────────────
+router.get('/month/:month',                      getByMonth);          // 21
+router.get('/year/:year',                        getByYear);           // 22
+router.get('/hour/:hour',                        getByHour);           // 23
+router.get('/minute/:minute',                    getByMinute);         // 24
+router.get('/source/:pickup',                    getBySource);         // 25
+router.get('/destination/:drop',                 getByDestination);    // 26
+router.get('/vehicle-image/:imageName',          getByVehicleImage);   // 27
+router.get('/fare/:value',                       getByFare);           // 28
+router.get('/customer/:customerId/history',      getCustomerHistory);  // 29
+router.get('/customer/:customerId/latest',       getCustomerLatest);   // 30
 
 module.exports = router;
