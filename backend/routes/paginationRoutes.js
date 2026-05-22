@@ -6,6 +6,11 @@ const {
   getVehicles,
   getSuccessRides,
   getCancelledRides,
+  // Part 2
+  getIncompleteRides,
+  getRatings,
+  getPayments,
+  getAdminBookings,
 } = require('../controllers/paginationController');
 
 const router = express.Router();
@@ -27,5 +32,19 @@ router.get('/success-rides',   getSuccessRides);
 
 // Route 6: GET /api/v1/cancelled-rides?page=2&limit=10
 router.get('/cancelled-rides', getCancelledRides);
+
+// ── Part 2: Paginated Routes (6–10) ───────────────────────────────────────────
+
+// Route 7: GET /api/v1/incomplete-rides?page=1&limit=5
+router.get('/incomplete-rides', getIncompleteRides);
+
+// Route 8: GET /api/v1/ratings?page=1&limit=25
+router.get('/ratings',          getRatings);
+
+// Route 9: GET /api/v1/payments?page=1&limit=20
+router.get('/payments',         getPayments);
+
+// Route 10: GET /api/v1/admin/bookings?page=1&limit=50 (admin only)
+router.get('/admin/bookings',   authorize('admin'), getAdminBookings);
 
 module.exports = router;
