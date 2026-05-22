@@ -12,10 +12,11 @@ const errorHandler = require('./middlewares/errorHandler');
 const ApiResponse = require('./utils/apiResponse');
 
 // Import routes
-const healthRoutes = require('./routes/healthRoutes');
-const authRoutes = require('./routes/authRoutes');
-const bookingRoutes = require('./routes/bookingRoutes');
-const analyticsRoutes = require('./routes/analyticsRoutes');
+const healthRoutes     = require('./routes/healthRoutes');
+const authRoutes       = require('./routes/authRoutes');
+const bookingRoutes    = require('./routes/bookingRoutes');
+const analyticsRoutes  = require('./routes/analyticsRoutes');
+const paginationRoutes = require('./routes/paginationRoutes');
 
 // Connect to Database
 connectDB();
@@ -40,10 +41,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 // 4. Mount API Routes
-app.use('/api/v1/health', healthRoutes);
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/bookings', bookingRoutes);
+app.use('/api/v1/health',    healthRoutes);
+app.use('/api/v1/auth',      authRoutes);
+app.use('/api/v1/bookings',  bookingRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
+app.use('/api/v1',           paginationRoutes);
 
 // 5. Fallback 404 Route handler
 app.use((req, res, next) => {
