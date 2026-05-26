@@ -1,5 +1,6 @@
 const express = require('express');
 const { protect, authorize } = require('../middlewares/auth');
+const { deleteAllCancelledBookings } = require('../controllers/bookingController');
 const {
   // Part 1
   getCustomers,
@@ -32,6 +33,7 @@ router.get('/success-rides',   getSuccessRides);
 
 // Route 6: GET /api/v1/cancelled-rides?page=2&limit=10
 router.get('/cancelled-rides', getCancelledRides);
+router.delete('/cancelled-rides/delete-all', deleteAllCancelledBookings);
 
 // ── Part 2: Paginated Routes (6–10) ───────────────────────────────────────────
 
