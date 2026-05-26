@@ -193,12 +193,19 @@ const getBookings = asyncHandler(async (req, res) => {
   // ── Sort param: ?sort=Field or ?sort=-Field ──────────────────────────────
   // Prefix dash (-) means descending. Maps human-readable keys to Mongoose field names.
   // Part 1 — Booking_Value, Ride_Distance, Driver_Ratings, Customer_Rating, Date
+  // Part 2 — Vehicle_Type, Payment_Method, Pickup_Location, Drop_Location
+  // Part 3 — Booking_Status
   const sortFieldMap = {
     'Booking_Value':   'bookingValue',   // ?sort=Booking_Value
     'Ride_Distance':   'rideDistance',   // ?sort=Ride_Distance
     'Driver_Ratings':  'driverRating',   // ?sort=Driver_Ratings
     'Customer_Rating': 'customerRating', // ?sort=Customer_Rating
     'Date':            'date',           // ?sort=Date
+    'Vehicle_Type':    'vehicleType',    // ?sort=Vehicle_Type
+    'Payment_Method':  'paymentMethod',  // ?sort=Payment_Method
+    'Pickup_Location': 'pickupLocation', // ?sort=Pickup_Location
+    'Drop_Location':   'dropLocation',   // ?sort=Drop_Location
+    'Booking_Status':  'bookingStatus',  // ?sort=Booking_Status
   };
 
   let resolvedSortBy = sortBy;
