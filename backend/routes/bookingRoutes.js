@@ -6,6 +6,7 @@ const {
   updateBooking,
   updateBookingStatus,
   deleteBooking,
+  bulkInsertBookings,
 } = require('../controllers/bookingController');
 
 const {
@@ -53,6 +54,7 @@ router.use(protect);
 
 // ── Core CRUD ─────────────────────────────────────────────────────────────────
 router.route('/').get(getBookings).post(createBooking);
+router.post('/bulk-insert', bulkInsertBookings);
 router.route('/:bookingId/status').patch(updateBookingStatus);
 router.route('/:bookingId').get(getBookingById).put(updateBooking).delete(deleteBooking);
 
