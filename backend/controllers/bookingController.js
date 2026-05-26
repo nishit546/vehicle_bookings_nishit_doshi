@@ -367,6 +367,34 @@ const deleteBooking = asyncHandler(async (req, res) => {
   return ApiResponse.success(res, `Booking ${bookingId} deleted successfully.`, null, 200);
 });
 
+/**
+ * @desc    Bulk insert bookings
+ * @route   POST /api/v1/bookings/bulk-insert
+ * @access  Private
+ */
+const bulkInsertBookings = asyncHandler(async (req, res) => {
+  const { bookings } = req.body;
+
+  if (!bookings || !Array.isArray(bookings) || bookings.length === 0) {
+    return ApiResponse.error(res, 'Please provide a non-empty array of booking objects in the bookings field.', null, 400);
+  }
+
+  // Set default values where necessary
+  const preparedBookings = bookings.map((b) => ({
+    ...b,
+    date: b.date ? new Date(b.date) : new Date(),
+    time: b.time || '00:00:00',
+    bookingStatus: b.bookingStatus || 'Success',
+    customerId: b.customerId || 'UNKNOWN',
+    bookingValue: Number(b.bookingValue) || 0,
+    rideDistance: Number(b.rideDistance) || 0,
+    isDeleted: false,
+  }));
+
+  const result = await Booking.insertMany(preparedBookings, { ordered: false });
+  return ApiResponse.success(res, `${result.length} bookings inserted successfully.`, result, 201);
+});
+
 module.exports = {
   getBookings,
   getBookingById,
@@ -374,4 +402,5 @@ module.exports = {
   updateBooking,
   updateBookingStatus,
   deleteBooking,
+  bulkInsertBookings,
 };
