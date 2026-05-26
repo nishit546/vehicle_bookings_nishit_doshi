@@ -395,6 +395,28 @@ const bulkInsertBookings = asyncHandler(async (req, res) => {
   return ApiResponse.success(res, `${result.length} bookings inserted successfully.`, result, 201);
 });
 
+/**
+ * @desc    Delete all booking records (hard delete)
+ * @route   DELETE /api/v1/bookings/delete-all
+ * @access  Private
+ */
+const deleteAllBookings = asyncHandler(async (req, res) => {
+  const result = await Booking.deleteMany({});
+  return ApiResponse.success(res, `All bookings deleted successfully. Count: ${result.deletedCount}`, null, 200);
+});
+
+/**
+ * @desc    Delete all cancelled bookings (hard delete)
+ * @route   DELETE /api/v1/cancelled-rides/delete-all
+ * @access  Private
+ */
+const deleteAllCancelledBookings = asyncHandler(async (req, res) => {
+  const result = await Booking.deleteMany({
+    bookingStatus: { $regex: /^Canceled/i }
+  });
+  return ApiResponse.success(res, `All cancelled bookings deleted successfully. Count: ${result.deletedCount}`, null, 200);
+});
+
 module.exports = {
   getBookings,
   getBookingById,
@@ -403,4 +425,6 @@ module.exports = {
   updateBookingStatus,
   deleteBooking,
   bulkInsertBookings,
+  deleteAllBookings,
+  deleteAllCancelledBookings,
 };
