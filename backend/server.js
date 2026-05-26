@@ -17,6 +17,7 @@ const authRoutes       = require('./routes/authRoutes');
 const bookingRoutes    = require('./routes/bookingRoutes');
 const analyticsRoutes  = require('./routes/analyticsRoutes');
 const paginationRoutes = require('./routes/paginationRoutes');
+const searchRoutes     = require('./routes/searchRoutes');
 
 // Connect to Database
 connectDB();
@@ -45,6 +46,7 @@ app.use('/api/v1/health',    healthRoutes);
 app.use('/api/v1/auth',      authRoutes);
 app.use('/api/v1/bookings',  bookingRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
+app.use('/api/v1/search',    searchRoutes);
 app.use('/api/v1',           paginationRoutes);
 
 // 5. Fallback 404 Route handler
