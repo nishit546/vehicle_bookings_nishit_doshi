@@ -423,6 +423,195 @@
           "response": []
         },
         {
+          "name": "Fetch rides within fare range",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/bookings?minFare=500&maxFare=2000",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "minFare",
+                  "value": "500"
+                },
+                {
+                  "key": "maxFare",
+                  "value": "2000"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch recent cancelled rides",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/bookings?status=Canceled by Driver&sort=-Date",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Canceled by Driver"
+                },
+                {
+                  "key": "sort",
+                  "value": "-Date"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch Mini rides with cash payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/bookings?vehicle=Mini&payment=Cash",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "vehicle",
+                  "value": "Mini"
+                },
+                {
+                  "key": "payment",
+                  "value": "Cash"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch highly rated driver rides",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/bookings?driverRating=4&page=1&limit=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "driverRating",
+                  "value": "4"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch long rides sorted by distance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/bookings?distanceAbove=20&sort=-Ride_Distance",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "distanceAbove",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "-Ride_Distance"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get Single Booking by BookingId",
           "request": {
             "auth": {
