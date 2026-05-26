@@ -29,6 +29,23 @@ const createRating = asyncHandler(async (req, res) => {
   return ApiResponse.success(res, 'Rating created successfully.', rating, 201);
 });
 
+/**
+ * @desc    Delete a rating record (hard delete)
+ * @route   DELETE /api/v1/ratings/:ratingId
+ * @access  Private
+ */
+const deleteRating = asyncHandler(async (req, res) => {
+  const { ratingId } = req.params;
+
+  const rating = await Rating.findOneAndDelete({ ratingId });
+  if (!rating) {
+    return ApiResponse.error(res, `Rating with ID ${ratingId} not found.`, null, 404);
+  }
+
+  return ApiResponse.success(res, `Rating ${ratingId} deleted successfully.`, null, 200);
+});
+
 module.exports = {
   createRating,
+  deleteRating,
 };

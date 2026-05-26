@@ -1,12 +1,11 @@
 const express = require('express');
 const { protect } = require('../middlewares/auth');
-const { createRating, deleteRating } = require('../controllers/ratingController');
+const { deleteLog } = require('../controllers/logController');
 
 const router = express.Router();
 
 router.use(protect);
 
-router.post('/', createRating);
-router.delete('/:ratingId', deleteRating);
+router.delete('/:id', deleteLog);
 
 module.exports = router;

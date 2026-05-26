@@ -30,6 +30,23 @@ const createPayment = asyncHandler(async (req, res) => {
   return ApiResponse.success(res, 'Payment created successfully.', payment, 201);
 });
 
+/**
+ * @desc    Delete a payment record (hard delete)
+ * @route   DELETE /api/v1/payments/:paymentId
+ * @access  Private
+ */
+const deletePayment = asyncHandler(async (req, res) => {
+  const { paymentId } = req.params;
+
+  const payment = await Payment.findOneAndDelete({ paymentId });
+  if (!payment) {
+    return ApiResponse.error(res, `Payment with ID ${paymentId} not found.`, null, 404);
+  }
+
+  return ApiResponse.success(res, `Payment ${paymentId} deleted successfully.`, null, 200);
+});
+
 module.exports = {
   createPayment,
+  deletePayment,
 };
