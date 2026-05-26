@@ -25,6 +25,7 @@ const ratingRoutes     = require('./routes/ratingRoutes');
 const vehicleRoutes    = require('./routes/vehicleRoutes');
 const locationRoutes   = require('./routes/locationRoutes');
 const logRoutes        = require('./routes/logRoutes');
+const middlewareRoutes  = require('./routes/middlewareRoutes');
 
 // Connect to Database
 connectDB();
@@ -61,6 +62,7 @@ app.use('/api/v1/ratings',   ratingRoutes);
 app.use('/api/v1/vehicles',  vehicleRoutes);
 app.use('/api/v1/locations', locationRoutes);
 app.use('/api/v1/logs',      logRoutes);
+app.use('/api/v1',           middlewareRoutes);
 app.use('/api/v1',           paginationRoutes);
 
 // 5. Fallback 404 Route handler

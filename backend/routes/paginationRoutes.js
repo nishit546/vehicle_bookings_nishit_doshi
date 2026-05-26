@@ -11,7 +11,6 @@ const {
   getIncompleteRides,
   getRatings,
   getPayments,
-  getAdminBookings,
 } = require('../controllers/paginationController');
 
 const router = express.Router();
@@ -45,8 +44,5 @@ router.get('/ratings',          getRatings);
 
 // Route 9: GET /api/v1/payments?page=1&limit=20
 router.get('/payments',         getPayments);
-
-// Route 10: GET /api/v1/admin/bookings?page=1&limit=50 (admin only)
-router.get('/admin/bookings',   authorize('admin'), getAdminBookings);
 
 module.exports = router;
