@@ -45,7 +45,38 @@ const bulkInsertCustomers = asyncHandler(async (req, res) => {
   return ApiResponse.success(res, `${result.length} customers inserted successfully.`, result, 201);
 });
 
+/**
+ * @desc    Delete a customer record (soft delete)
+ * @route   DELETE /api/v1/customers/:customerId
+ * @access  Private
+ */
+const deleteCustomer = asyncHandler(async (req, res) => {
+  const { customerId } = req.params;
+
+  const customer = await Customer.findOne({ customerId, isDeleted: false });
+  if (!customer) {
+    return ApiResponse.error(res, `Customer with ID ${customerId} not found.`, null, 404);
+  }
+
+  customer.isDeleted = true;
+  await customer.save();
+
+  return ApiResponse.success(res, `Customer ${customerId} deleted successfully.`, null, 200);
+});
+
+/**
+ * @desc    Delete all customer records (hard delete)
+ * @route   DELETE /api/v1/customers/delete-all
+ * @access  Private
+ */
+const deleteAllCustomers = asyncHandler(async (req, res) => {
+  const result = await Customer.deleteMany({});
+  return ApiResponse.success(res, `All customers deleted successfully. Count: ${result.deletedCount}`, null, 200);
+});
+
 module.exports = {
   createCustomer,
   bulkInsertCustomers,
+  deleteCustomer,
+  deleteAllCustomers,
 };
