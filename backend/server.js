@@ -16,6 +16,7 @@ const bookingRoutes    = require('./routes/bookingRoutes');
 const analyticsRoutes  = require('./routes/analyticsRoutes');
 const paginationRoutes = require('./routes/paginationRoutes');
 const searchRoutes     = require('./routes/searchRoutes');
+const userRoutes       = require('./routes/userRoutes');
 const customerRoutes   = require('./routes/customerRoutes');
 const driverRoutes     = require('./routes/driverRoutes');
 const paymentRoutes    = require('./routes/paymentRoutes');
@@ -59,6 +60,7 @@ app.get('/compare', require('./middlewares/auth').protect, advanceController.com
 app.get('/api/v1/compare', require('./middlewares/auth').protect, advanceController.compareBookings);
 
 app.use('/api/v1/auth',      authRoutes);
+app.use('/api/v1/users',     userRoutes);
 app.use('/api/v1/bookings',  bookingRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/search',    searchRoutes);
