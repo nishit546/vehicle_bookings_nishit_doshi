@@ -75,6 +75,20 @@ const login = asyncHandler(async (req, res) => {
   );
 });
 
+const updateProfile = asyncHandler(async (req, res) => {
+  if (!req.user) return ApiResponse.error(res, 'User context not found.', null, 404);
+  const { name, email, customerId } = req.body;
+  if (name !== undefined) req.user.name = name;
+  if (email !== undefined) req.user.email = email;
+  if (customerId !== undefined) req.user.customerId = customerId;
+  await req.user.save();
+  return ApiResponse.success(res, 'Profile updated successfully.', {
+    id: req.user._id, name: req.user.name, email: req.user.email,
+    role: req.user.role, customerId: req.user.customerId,
+    createdAt: req.user.createdAt, updatedAt: req.user.updatedAt,
+  }, 200);
+});
+
 const getProfile = asyncHandler(async (req, res) => {
   if (!req.user) {
     return ApiResponse.error(res, 'User context not found.', null, 404);
@@ -196,6 +210,7 @@ module.exports = {
   register,
   login,
   getProfile,
+  updateProfile,
   logout,
   forgotPassword,
   resetPassword,

@@ -3,6 +3,7 @@ const {
   register,
   login,
   getProfile,
+  updateProfile,
   logout,
   forgotPassword,
   resetPassword,
@@ -24,6 +25,7 @@ router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.post('/refresh-token', protect, refreshToken);
 router.get('/profile', protect, getProfile);
+router.put('/profile', protect, updateProfile);
 router.get('/me', protect, getProfile);
 router.delete('/account', protect, deleteAccount);
 
