@@ -1,16 +1,66 @@
-# React + Vite
+# Vehicle Bookings — Frontend Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack admin + user dashboard for managing 18,000+ vehicle booking records, built with React, MUI, and Express/MongoDB backend.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Vite + React** — Build tool & UI framework
+- **MUI v6** — Component library
+- **Tailwind CSS v4** — Utility CSS
+- **Redux Toolkit** — State management
+- **React Router v7** — Routing with lazy loading
+- **Axios** — HTTP client with interceptors
+- **Formik + Yup** — Forms & validation
+- **Recharts** — Analytics charts
+- **Notistack** — Toast notifications
+- **React Helmet Async** — SEO metadata
 
-## React Compiler
+## Folder Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+src/
+├── app/           # Theme config
+├── components/    # Reusable UI (Button, Table, Modal, etc.)
+├── features/      # Feature-based modules
+├── hooks/         # Custom hooks
+├── layouts/       # Dashboard layout (sidebar + navbar)
+├── pages/         # Route pages (auth, dashboard, users, etc.)
+├── routes/        # Route config + protected route guard
+├── services/      # API layer (Axios instances)
+├── store/         # Redux Toolkit (authSlice, uiSlice)
+├── utils/         # Helpers
+```
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+cd frontend
+npm install
+npm run dev     # → http://localhost:3000
+```
+
+## Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server (port 3000) |
+| `npm run build` | Production build |
+| `npm run preview` | Preview production build |
+
+## Features
+
+- JWT authentication (login/register/logout)
+- Protected routes with role-based access
+- User management (CRUD with Modals + Formik/Yup)
+- Bookings data listing (search, filter, pagination)
+- Analytics dashboard (Revenue, Status, Locations, Ratings charts)
+- Profile management (view/edit)
+- Dark/Light theme (persisted)
+- Toast notifications
+- Skeleton loaders, empty states, error states
+- Lazy-loaded routes for performance
+- SEO metadata via React Helmet
+
+## API Integration
+
+All pages connect to the backend at `/api/v1/*` via Axios. The dev server proxies `/api` requests to `http://localhost:5000`.
